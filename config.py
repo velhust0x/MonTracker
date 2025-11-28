@@ -15,5 +15,5 @@ CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", "10"))  # seconds
 MAX_RETRIES = int(os.getenv("MAX_RETRIES", "3"))
 
 # Database Configuration
-DATABASE_PATH = os.getenv("DATABASE_PATH", "bot.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "")
 

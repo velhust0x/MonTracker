@@ -10,7 +10,7 @@ from config import (
     MONAD_RPC_URL,
     MONAD_CHAIN_ID,
     CHECK_INTERVAL,
-    DATABASE_PATH
+    DATABASE_URL
 )
 from abis import ERC20_ABI, ERC721_ABI, ERC1155_ABI, FUNCTION_SIGNATURES
 from database import Database
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 w3 = Web3(Web3.HTTPProvider(MONAD_RPC_URL))
 
 # Initialize Database
-db = Database(DATABASE_PATH)
+db = Database(DATABASE_URL)
 
 
 def get_token_info(token_address: str) -> Dict[str, str]:
