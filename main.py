@@ -636,25 +636,21 @@ async def check_wallet_activity(wallet_address: str, user_id: int, chat_id: int,
 
 
 async def monitor_wallets(context: ContextTypes.DEFAULT_TYPE):
-    """Periodically check all tracked wallets"""
-    while True:
-        try:
-            wallets = db.get_all_tracked_wallets()
-            for wallet_info in wallets:
-                wallet_address = wallet_info['wallet_address']
-                user_id = wallet_info['user_id']
-                chat_id = wallet_info.get('chat_id')
-                
-                if chat_id:
-                    try:
-                        await check_wallet_activity(wallet_address, user_id, chat_id, context)
-                    except Exception as e:
-                        logger.error(f"Error monitoring wallet {wallet_address}: {e}")
+    """Check all tracked wallets once (JobQueue calls this periodically)."""
+    try:
+        wallets = db.get_all_tracked_wallets()
+        for wallet_info in wallets:
+            wallet_address = wallet_info['wallet_address']
+            user_id = wallet_info['user_id']
+            chat_id = wallet_info.get('chat_id')
             
-            await asyncio.sleep(CHECK_INTERVAL)
-        except Exception as e:
-            logger.error(f"Error in monitor loop: {e}")
-            await asyncio.sleep(CHECK_INTERVAL)
+            if chat_id:
+                try:
+                    await check_wallet_activity(wallet_address, user_id, chat_id, context)
+                except Exception as e:
+                    logger.error(f"Error monitoring wallet {wallet_address}: {e}")
+    except Exception as e:
+        logger.error(f"Error in monitor loop: {e}")
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -830,7 +826,7 @@ def main():
     # Start monitoring job
     job_queue = application.job_queue
     job_queue.run_repeating(
-        lambda context: asyncio.create_task(monitor_wallets(context)),
+        monitor_wallets,
         interval=CHECK_INTERVAL,
         first=CHECK_INTERVAL
     )
